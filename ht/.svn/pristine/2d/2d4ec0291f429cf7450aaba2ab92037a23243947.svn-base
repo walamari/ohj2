@@ -1,0 +1,201 @@
+package liiga;
+
+import java.io.File;
+import java.util.Collection;
+import java.util.List;
+
+/**
+ * Liiga luokka, mikä huolehtii kaikista pelaajista
+ * @author Valtteri Peltoniemi & Konsta Kähtävä
+ * @version 7.3.2019
+ *
+ */
+public class Liiga {
+    
+    
+    private Pelaajat pelaajat = new Pelaajat();
+    private Joukkueet joukkueet = new Joukkueet();
+    //private Pelipaikat pelipaikat = new Pelipaikat();
+    
+    
+    /**
+     * @param nimi tiedoston nimi
+     * @throws SailoException poikkeus 
+     */
+    public void lueTiedostosta(String nimi) throws SailoException {
+        
+        pelaajat = new Pelaajat();
+        joukkueet = new Joukkueet();
+        
+        setTiedosto(nimi);
+        pelaajat.lueTiedostosta();
+        joukkueet.lueTiedostosta();
+    }
+    
+    /**
+     * Asettaa tiedostojen perusnimet
+     * @param nimi uusi nimi
+     */
+    public void setTiedosto(String nimi) {
+        File dir = new File(nimi);
+        dir.mkdirs();
+        String hakemistonNimi = "";
+        if ( !nimi.isEmpty() ) hakemistonNimi = nimi +"/";
+        pelaajat.setTiedostonPerusNimi(hakemistonNimi + "pelaajat");
+        joukkueet.setTiedostonPerusNimi(hakemistonNimi + "joukkueet");
+    }
+    
+    /**
+     * Palauttaa liigan pelaajien määrän
+     * @return pelajien määrän
+     */
+    public int getPelaajia() {
+        return pelaajat.getLkm(); 
+    }
+    
+    /**
+     * Palautta pelaajan, joka on indeksissä i
+     * @param i pelaajan indeksi, joka palautetaan
+     * @return indeksissä i olevan pelaajan viite
+     * @throws IndexOutOfBoundsException jos annettu indeksi i on väärä
+     */
+    public Pelaaja annaPelaaja(int i) throws IndexOutOfBoundsException {
+        return pelaajat.anna(i);
+    }
+    
+    /**
+     * Lisää uuden pelajaan tietorakenteeseen. Ottaa pelaajan omistukseensa.
+     * @param pelaaja lisättävä pelaaja
+     * @example
+     * <pre name="test">
+     * #THROWS SailoException 
+     * Liiga liiga = new Liiga();
+     * Pelaaja pelaaja1 = new Pelaaja();
+     * Pelaaja pelaaja2 = new Pelaaja();
+     * pelaaja1.rekisteroi();
+     * pelaaja2.rekisteroi();
+     * liiga.getPelaajia() === 0;
+     * liiga.lisaa(pelaaja1); liiga.getPelaajia() === 1;
+     * liiga.lisaa(pelaaja2); liiga.getPelaajia() === 2;
+     * liiga.lisaa(pelaaja1); liiga.getPelaajia() === 3;
+     * liiga.getPelaajia() === 3;
+     * liiga.annaPelaaja(0) === pelaaja1;
+     * liiga.annaPelaaja(1) === pelaaja2;
+     * liiga.annaPelaaja(2) === pelaaja1;
+     */
+    public void lisaa(Pelaaja pelaaja){
+        pelaajat.lisaa(pelaaja);
+    }
+    
+    /**
+     * Lisää uuden joukkueen liigaan
+     * @param jouk lisättävä joukkue
+     */
+    public void lisaa(Joukkue jouk) {
+        joukkueet.lisaa(jouk);
+    }
+    
+    
+    /**
+     * Lisää uuden pelipaikan liigaan
+     * @param paikka lisättävä pelipaikka
+     
+    public void lisaa(Pelipaikka paikka) {
+        pelipaikat.lisaa(paikka);
+    }
+    */
+    
+    /**
+     * Haetaan pelaajan joukkue
+     * @param joukkueid  pelaajalla oleva joukkue id
+     * @return tietorakenne, jossa viite löydettyyn joukkueeseen
+     */
+    public Joukkue annaJoukkue(int joukkueid) {
+        return joukkueet.annaJoukkue(joukkueid);
+    }
+    
+    /**
+     * Haetaan pelaajan pelipaikka
+     * @param pelaaja pelaaja, jonka pelipaikka haetaan
+     * @return tietorakenne, jossa viite löydettyyn pelipaikkaan
+    
+    public List<Pelipaikka> annaPelipaikat(Pelaaja pelaaja) {
+        return pelipaikat.annaPelipaikat(pelaaja.getPelaajaid());
+    }
+     */
+    
+    /**
+     * Tallenttaa liigan tiedot tiedostoon. 
+     * @throws SailoException jos tallettamisessa ongelmia
+     */
+    public void tallenna() throws SailoException {
+        String virhe = "";
+        try {
+            pelaajat.tallenna();
+        } catch ( SailoException ex ) {
+            virhe = ex.getMessage();
+        }
+        try {
+            joukkueet.tallenna();
+        } catch ( SailoException ex ) {
+            virhe = ex.getMessage();
+        }
+        if ( "".equals(virhe) ) return;
+        throw new SailoException(virhe);
+    }
+
+    
+
+   
+    /**
+     * @param args ei käytössä
+     */
+    public static void main(String[] args) {
+    
+        Liiga liiga = new Liiga();
+        
+        Pelaaja erik = new Pelaaja();
+        Pelaaja erik2 = new Pelaaja();
+        
+        erik.rekisteroi(); 
+        erik.vastaaErikPerrin();
+        erik2.rekisteroi(); 
+        erik2.vastaaErikPerrin();
+        
+    
+            liiga.lisaa(erik);
+            liiga.lisaa(erik2);
+            int id1 = erik.getPelaajaid();
+            int id2 = erik2.getPelaajaid();
+           // int pid1 = erik.getPelaajaid();
+            //int pid2 = erik2.getPelaajaid();
+            Joukkue jyp1 = new Joukkue(id1); jyp1.vastaaJoukkue(id1); liiga.lisaa(jyp1);
+            Joukkue jyp2 = new Joukkue(id2); jyp2.vastaaJoukkue(id2); liiga.lisaa(jyp2);
+            
+            //Pelipaikka hyokkaaja = new Pelipaikka(); //hyokkaaja.vastaaPelipaikka(pid1);
+            //liiga.lisaa(hyokkaaja);
+           // Pelipaikka puolustaja = new Pelipaikka(); //puolustaja.vastaaPelipaikka(pid2);
+            //liiga.lisaa(puolustaja);
+        
+
+        
+        System.out.println("=================== Pelaajat testi ====================");
+        
+        
+    /**   
+        for (int i = 0; i < liiga.getPelaajia();i++) {
+            Pelaaja pelaaja = liiga.annaPelaaja(i);
+            System.out.println("Pelaaja paikassa: " + i);
+            pelaaja.tulosta(System.out);
+            List<Joukkue> loydetyt = liiga.annaJoukkue(pelaaja);
+                for (Joukkue jouk : loydetyt) 
+                    jouk.tulosta(System.out);
+       
+        }
+
+   */
+        
+   
+    }
+
+}

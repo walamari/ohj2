@@ -1,0 +1,311 @@
+package liigarekisteri;
+
+import java.io.PrintStream;
+import java.net.URL;
+import java.util.List;
+import java.util.ResourceBundle;
+
+import fi.jyu.mit.fxgui.Dialogs;
+import fi.jyu.mit.fxgui.ListChooser;
+import fi.jyu.mit.fxgui.ModalController;
+import fi.jyu.mit.fxgui.TextAreaOutputStream;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextArea;
+
+import javafx.scene.input.MouseEvent;
+import javafx.scene.text.Font;
+import liiga.Joukkue;
+import liiga.Liiga;
+import liiga.Pelaaja;
+import liiga.SailoException;
+
+
+
+
+/**
+ *  Luokka, jolla hoidetaan liiga k‰yttˆliittym‰n tapahtumia.
+ * 
+ * @author Valtteri Peltoniemi & Konsta K‰ht‰v‰
+ * @version 8.3.2019
+ *
+ */
+public class FxliigaGUIController implements Initializable {
+
+    @Override
+    public void initialize(URL url, ResourceBundle bundle) {
+       alusta();       
+    }
+    
+
+    @FXML private Button uusiPelaaja;
+
+    @FXML private Button poistaPelaaja;
+
+    @FXML private Button haeSeura;
+    
+    @FXML private ScrollPane panelPelaaja;
+    
+    @FXML private ListChooser<Pelaaja> chooserPelaajat;
+    
+
+    @FXML void handleUusiPelaaja() {
+       uusiPelaaja(); 
+       uusiJoukkue();
+       //uusiPelipaikka();
+      
+    }
+
+
+    @FXML private void handleEtsiJoukkue() {
+        avaaVirheikkuna();
+        
+    }
+    
+    @SuppressWarnings("unused")
+    @FXML void handleTallennus( ActionEvent event) {
+        tallenna();
+    }
+    
+    
+    @SuppressWarnings("unused")
+    @FXML void HakuEhto(MouseEvent  event) {
+        Dialogs.showMessageDialog("Ei osata etsi‰ pelaajaa");
+    }
+
+    
+    @SuppressWarnings("unused")
+    @FXML private void avaaMuokkausIkkuna(MouseEvent event) {
+        ModalController.showModal(FxliigaGUIController.class.getResource("PelaajanMuokkausGUIView.fxml"), "Joukkue haku", null, "");
+        
+    }
+    
+    
+    @FXML private void handlePoistaPelaaja() {
+        Dialogs.showMessageDialog("Ei osata poistaa pelaajaa");
+        
+    }
+    
+    @FXML private void handleTallenna() {
+        tallenna();
+    }
+
+    @FXML private void handleTietoja() {
+        Dialogs.showMessageDialog("ei tietoja saatavilla");
+    }
+    
+    @FXML private void handleClose() {
+        Dialogs.showMessageDialog("Ei tietoja mit‰ halutaan sis‰lt‰‰");
+    }
+    
+    @FXML private void handlePeruuta() {
+        Dialogs.showMessageDialog("Ei onnistu");
+    }
+    
+    
+
+
+//==================== Ei k‰yttˆliittym‰‰n liittyv‰‰ suoraa koodia =============================\\
+    
+
+    /**
+     * avaa virheikkunan
+     */
+    public void avaaVirheikkuna() {
+        ModalController.showModal(FxliigaGUIController.class.getResource("VirheIkkunaGUIView.fxml"), "Joukkue haku", null, "");
+    }
+    
+    private Liiga liiga;
+    private TextArea areaPelaaja = new TextArea();
+    private Pelaaja pelaajakohdalla;
+    private String joku;
+   
+    
+
+    
+    
+    /**
+     * Tekee tarvittavat alustukset ja vaihtaa Scrollpanen p‰‰lle ison teksti alueen, jonka
+     * p‰‰lle tulostetaan tietoja.
+     */
+    private void alusta() {
+        panelPelaaja.setContent(areaPelaaja);
+        areaPelaaja.setFont(new Font("Courier New", 12));
+        panelPelaaja.setFitToHeight(true);
+        
+        chooserPelaajat.clear();
+        chooserPelaajat.addSelectionListener(e-> naytaPelaaja());
+    }
+    
+    /**
+     * Kysyt‰‰n tiedoston nimi ja luetaan se
+     * @return true jos onnistui, false jos ei
+     */
+    public boolean avaa() {
+        String uusinimi = joku;
+        if (uusinimi == null) return false;
+        lueTiedosto(uusinimi);
+        return true;
+    }
+    
+    /**
+     * N‰ytt‰‰ v‰liaikaisesti valitun pelaajan tiedot  tekstikentt‰‰n.
+     */
+    private void naytaPelaaja() {
+        pelaajakohdalla = chooserPelaajat.getSelectedObject(); 
+        if (pelaajakohdalla == null) return;
+        areaPelaaja.setText("");
+        try (PrintStream os = TextAreaOutputStream.getTextPrintStream(areaPelaaja)) {
+            tulosta(os, pelaajakohdalla);
+        }
+    }
+    
+    /**
+     * Alustaa liigan lukemalla sen valitun nimisest‰ tiedostosta
+     * @param nimi tiedosto josta kerhon tiedot luetaan
+     */
+    protected void lueTiedosto(String nimi) {
+        
+        try {
+            liiga.lueTiedostosta(nimi);
+            hae(0);
+           
+        } catch (SailoException e) {
+            hae(0);
+            String virhe = e.getMessage(); 
+            if ( virhe != null ) Dialogs.showMessageDialog(virhe);
+           
+        }
+     }
+
+    
+    /**
+     * Luo uuden pelaajan, jota aletaan muokkaamaan
+     */
+   private void uusiPelaaja() {
+       Pelaaja tyyppi = new Pelaaja();
+       tyyppi.rekisteroi();
+       tyyppi.vastaaErikPerrin();   //todo korvaa ett‰ aukeaa uusi dialogi
+      
+       liiga.lisaa(tyyppi);
+
+       hae(tyyppi.getPelaajaid());
+       
+   }
+   
+   
+   /**
+    * Tekee uuden tyhj‰n joukkueen muokkaamista varten
+    */
+   private void uusiJoukkue() {       
+       if (pelaajakohdalla == null) return; 
+       Joukkue tiimi = new Joukkue();
+       tiimi.rekisteroi();
+       tiimi.vastaaJoukkue(pelaajakohdalla.getPelaajaid()); 
+       liiga.lisaa(tiimi);
+       hae(tiimi.getPelaajannumero());
+       
+   }
+   
+   
+   /**
+    * Tietojen tallennus
+    */
+   private void tallenna() {
+       try {
+           liiga.tallenna();
+           return;
+       } catch (SailoException ex) {
+           Dialogs.showMessageDialog("Tallennuksessa ongelmia! " + ex.getMessage());
+           
+       }
+   }
+   
+   /**
+    * Tekee uuden tyhj‰n pelipaikan muokkaamista varten
+   
+   private void uusiPelipaikka() {
+       
+       if (pelaajakohdalla == null) return; 
+       Pelipaikka paikka = new Pelipaikka();
+       paikka.rekisteroi();
+       paikka.vastaaPelipaikka(pelaajakohdalla.getPelaajaid()); 
+       liiga.lisaa(paikka);
+       hae(paikka.getPelipaikkanumero());
+       
+   }
+    */
+   
+   /** 
+    * Tekee uuden tyhj‰n harrastuksen editointia varten 
+   
+   public void uusiHarrastus() { 
+       if ( pelaajakohdalla == null ) return;  
+       Joukkue har = new Joukkue();  
+       har.rekisteroi();  
+       har.vastaaJoukkue(pelaajakohdalla.getPelaajaid());  
+       liiga.lisaa(har); 
+       hae(pelaajakohdalla.getPelaajaid());          
+   } 
+    */ 
+
+   /**
+    * Hakee pelaajien tiedot listaan
+    * @param pnro pelaajan numero
+    */
+   
+   private void hae(int pnro) {
+
+      
+       chooserPelaajat.clear();
+       
+       int indeksi = 0;
+       for (int i = 0; i < liiga.getPelaajia(); i++) {
+           Pelaaja pelaaja = liiga.annaPelaaja(i);
+           if (pelaaja.getPelaajaid() == pnro) indeksi = i;
+           chooserPelaajat.add(pelaaja.getnimi(), pelaaja);
+        
+    }
+       
+       chooserPelaajat.getSelectionModel().select(indeksi); // muutosviesti, joka n‰ytt‰‰ j‰senen
+       
+   }
+   
+   
+   /**
+   * Tulostaa pelaajan tiedot 
+   * @param os tietovirta, johon tulostetaan
+   * @param pelaaja tulostettava pelaaja
+   */
+public void tulosta(PrintStream os, Pelaaja pelaaja) {
+    
+    pelaaja.tulosta(os); 
+    
+    /*
+     * List<Joukkue> joukkueet = 
+    for(Joukkue jouk : joukkueet)
+    */
+    
+    Joukkue pelaajanJoukkue = liiga.annaJoukkue(pelaaja.getJoukkue());
+    pelaajanJoukkue.tulosta(os);
+    
+    //List<Pelipaikka> pelipaikat = liiga.annaPelipaikat(pelaaja);
+   // for(Pelipaikka paikka : pelipaikat)
+        //paikka.tulosta(os);
+  
+}
+   
+    
+    /**
+     * Asetetaan viite liigaan
+     * @param liiga k‰ytett‰v‰ liiga
+     **/
+    public void setLiiga(Liiga liiga) {
+        this.liiga = liiga;
+    }
+    
+   
+}

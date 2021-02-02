@@ -1,0 +1,122 @@
+package liiga;
+
+import java.io.OutputStream;
+import java.io.PrintStream;
+
+import liigarekisteri.PelaajanMuokkausGUIController;
+
+import static apumetodit.Apumetodit.*;
+
+/**
+ * Pelipaikka joka osaa mm. itse huolehtia tunnusnumerostaan
+ * 
+ * @author Valtteri Peltoniemi & Konsta Kähtävä
+ * @version 7.3.2019
+ *
+ */
+public class Pelipaikka {
+
+    private int pelipaikkaid;
+    private String pelipaikka; 
+    
+    
+    
+    
+    //saa käyttää koska se laskee montako oliota ollaan tehty tästä luokasta, kaikki oliot pääsee käsiksi
+    private static int seuraavaNro = 1;
+    
+    /**
+     *  Alustetaan Pelipaikka
+     */
+    public Pelipaikka() {
+        // ei tarvitse käyttää vielä
+    }
+    
+    
+
+    /**
+     * Apumetodi, jolla saadaan täytettyä arvoja Pelipaikkalle
+     */
+    public void vastaaPelipaikka() {
+
+        this.pelipaikka = "hyökkääjä";
+    }
+    
+    
+    
+    /**
+     * Tulostaa pelipaikan tiedot
+     * @param out tietovirta mihin tulostetaan
+     */
+    public void tulosta(PrintStream out) {
+        out.println(" " + pelipaikka + " " + rand(100,999));
+    }
+    
+    
+    /**
+     * Tulostaa pelipaikan tiedot
+     * @param os tietovirta johon tulostetaan
+     */
+    public void tulosta(OutputStream os) {   // Tätä ei välttämättä tarvitse tässä kohtaa harjoitustyötä.
+        tulosta(new PrintStream(os));
+    }
+    
+    
+    /**
+     * Antaa pelipaikalle seuraavan rekisterinumeron
+     * @return pelipaikan uusi rekisterinumero
+     * @example
+     * <pre name="test">
+     * Pelipaikka pelipaikka1 = new Pelipaikka();
+     * pelipaikka1.getPelipaikkanumero() === 0;
+     * pelipaikka1.rekisteroi();
+     * Pelipaikka pelipaikka2 = new Pelipaikka(); 
+     * pelipaikka2.rekisteroi();
+     * int p1 = pelipaikka1.getPelipaikkanumero();
+     * int p2 = pelipaikka2.getPelipaikkanumero();
+     * p1 === p2-1;
+     * </pre>
+     */
+    public int rekisteroi() {
+        if (pelipaikkaid != 0 ) return pelipaikkaid; //estää saman pelipaika rekisteroitymisen
+        pelipaikkaid = seuraavaNro;
+        seuraavaNro++;
+        return pelipaikkaid;
+        
+    }
+    
+    
+    /**
+     * Palauttaa pelipaikan tunnusnumeron
+     * @return pelipaikan tunnusnumero
+     */
+    public int getPelipaikkanumero() {
+        return pelipaikkaid;
+    }
+    
+    
+
+    /**
+     * Testiohjelma pelipaikka-luokalle
+     * @param args ei käytössä
+     */
+    public static void main(String[] args) {
+
+
+        Pelipaikka hyokkaaja = new Pelipaikka();
+        Pelipaikka puolustaja = new Pelipaikka();
+        Pelipaikka maalivahti = new Pelipaikka();
+        
+        hyokkaaja.rekisteroi();
+        hyokkaaja.vastaaPelipaikka();
+        hyokkaaja.tulosta(System.out);
+        puolustaja.rekisteroi();
+        puolustaja.vastaaPelipaikka();
+        puolustaja.tulosta(System.out);
+        maalivahti.rekisteroi();
+        maalivahti.vastaaPelipaikka();
+        maalivahti.tulosta(System.out);
+        
+    }
+
+}

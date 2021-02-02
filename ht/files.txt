@@ -1,0 +1,59 @@
+﻿=<h3> Ohjelman esisuunnitelma</h3>
+!https://tim.jyu.fi/view/kurssit/tie/ohj2/2019k/ht/vamipelt = Suunnitelma TIMissä
+=
+kuvat/etuikkuna.png = etuikkuna käsinpiirretty
+kuvat/paaikkuna.png = paaikkuna kuvakäsinpiirretty
+kuvat/virhe.png = virhe ilmoitus käsinpiirretty
+=
+
+=<h3>Ohjelman avustus</h3>
+!https://tim.jyu.fi/view/kurssit/tie/ohj2/2019k/ht/vamipelt = Suunnitelma TIMissä + avustus TIMissä
+
+=
+kuvat/pelaajamuokkaus.PNG = scenebuilderilla tehty kuva ikkunasta
+kuvat/etusivu.PNG = scenebuilderilla tehty kuva ikkunasta
+kuvat/svirheikkuna.png = scenebuilderilla tehty kuva ikkunasta
+
+=
+=<h3>Käyttöliittymän ulkoasu JavaFX:llä</h3>
+src\liigarekisteri\fxliiga.css = tyylitiedosto
+src\liigarekisteri\FxliigaGUIController.java = ohjelman käynnistävä pääluokka
+src\liigarekisteri\FxliigaGUIView.fxml = käyttöliittymä
+src\liigarekisteri\FxliigaMain.java = ohjelman käynnistävä pääluokka
+src\liigarekisteri\PelaajanMuokkausGUIController.java
+src\liigarekisteri\PelaajanMuokkausGUIView.fxml
+src\liigarekisteri\VirheIkkunaGUIController.java
+src\liigarekisteri\VirheIkkunaGUIView.fxml
+
+=
+=<h3>Ajettava ohjelma</h3>
+liiga.jar = ajettava ohjelma, lataa ja aja
+
+=
+=<h3>Muita tiedostoja</h3>
+build.xml = Ant - skripti joka tekee .jar:in
+.project = eclipsenn projecti
+.classpath = Eclipsen luokkapolku
+
+=
+=<h3>Tietorakenne ja luokat</h3>
+@https://tim.jyu.fi/view/kurssit/tie/ohj2/2019k/ht/vamipelt#crc-kortit = CRC-kortit TIMissä 
+kuvat/tietorakenne.png = tietorakneteen kuva
+
+=
+=<h3>Tietorakenteiden käsittely koodissa</h>
+src/liiga/Liiga.java = liiga joka välittää pyynnöt Pelaajat-luokalle
+src/liiga/Pelaaja.java = pelaaja joka osaa huolehtia omista tiedoistaan
+src/liiga/Pelaajat.java = pelaajien käsittely
+src/liiga/SailoException.java = poikkeusluokka virheille
+src/apumetodit/Apumetodit.java = apumetodeja muille luokille
+src/liiga/Joukkue.java = joukkue, joka osaa huolehtia omista tiedoistaan		
+src/liiga/Joukkueet.java = Joukkueiden käsittely
+src/liiga/Pelipaikka.java = Pelipaikka ,joka osaa huolehtia omista tiedoistaan
+src/liiga/Pelipaikat.java = Pelipaikkojen käsittely
+
+=
+joukkueet.bak  
+joukkueet.dat = joukkueiden tiedosto
+pelaajat.bak
+pelaajat.dat = pelaajien tiedosto

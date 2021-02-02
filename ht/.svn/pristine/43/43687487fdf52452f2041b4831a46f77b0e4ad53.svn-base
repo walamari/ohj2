@@ -1,0 +1,102 @@
+
+package liiga;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+/**
+ * Liigan Pelipaikat, joka osaa lisätä uuden pelipaikan
+ * 
+ * @author Valtteri Peltoniemi & Konsta Kähtävä
+ * @version 11.3.2019
+ *
+ */
+public class Pelipaikat {
+    
+    private final Pelipaikka[] alkiot = new Pelipaikka[3]; // Lista pelipaikoista
+    
+    
+    /**
+     * Alustetaan Pelipaikat
+     */
+    public Pelipaikat() {
+        // ei tarvitse käyttää vielä
+    }
+  
+
+    /**
+     * Lisää uuden Pelipaikan tietorakenteeseen
+     * @param paikka lisättävä pelipaikka
+     */
+    public void lisaa(Pelipaikka paikka) {
+        for (int i = 0; i < alkiot.length; i++) {
+            alkiot[i] = paikka;
+        }
+    }
+    
+    
+    /**
+     * Palauttaa Liigan pelipaikkojen lukumäärän
+     * @return Pelipaikkaiden lukumäärän
+     */
+    public int getLkm() {
+        return alkiot.length;
+    }
+    
+    
+    /**
+     * Haetaan pelaajan pelipaikka
+     * @param pelaajaId pelaajan ID, jolle pelipaikka haetaan
+     * @return tietorakenne, jossa viitteet löydettyyn pelipaikkaan
+     * @example
+     * <pre name="test">
+     * #import java.util.*;
+     * Pelipaikat Pelipaikat = new Pelipaikat();
+     * Pelipaikka hyokkaaja = new Pelipaikka(1); Pelipaikat.lisaa(hyokkaaja);
+     * Pelipaikka puolustaja = new Pelipaikka(2); Pelipaikat.lisaa(puolustaja);
+     * Pelipaikka maalivahti = new Pelipaikka(3); Pelipaikat.lisaa(maalivahti);
+     * 
+     * List<Pelipaikka> haetut;
+     * haetut = Pelipaikat.annaPelipaikat(1);
+     * haetut.size() === 1;
+     * haetut.get(0) == hyokkaaja === true;
+     * </pre>
+     */
+    public List<Pelipaikka> annaPelipaikat(int pelaajaId) {
+        List<Pelipaikka> loydetyt = new ArrayList<Pelipaikka>();
+        
+        for(Pelipaikka paikka : alkiot)
+            if (paikka.getPelipaikkanumero() == pelaajaId) loydetyt.add(paikka);
+        return loydetyt;
+                
+    }
+    
+    
+    /**
+     * @param args ei käytössä 
+     */
+    public static void main(String[] args) {
+    
+    Pelipaikat pelipaikat = new Pelipaikat();
+    Pelipaikka henkilo1 = new Pelipaikka();
+    henkilo1.vastaaPelipaikka();
+    Pelipaikka henkilo2 = new Pelipaikka();
+    henkilo2.vastaaPelipaikka();
+    Pelipaikka henkilo3 = new Pelipaikka();
+    henkilo3.vastaaPelipaikka();
+    
+    pelipaikat.lisaa(henkilo1);
+    pelipaikat.lisaa(henkilo2);
+    pelipaikat.lisaa(henkilo3);
+    
+    List<Pelipaikka> Pelipaikka2 = pelipaikat.annaPelipaikat(1);
+        for (Pelipaikka paikka : Pelipaikka2) {
+            System.out.println(paikka.getPelipaikkanumero() + " ");
+            paikka.tulosta(System.out);
+            
+        }
+    
+    }
+
+}

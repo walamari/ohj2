@@ -1,0 +1,166 @@
+package liigarekisteri;
+
+import java.net.URL;
+import java.util.ResourceBundle;
+
+import fi.jyu.mit.fxgui.Dialogs;
+import fi.jyu.mit.fxgui.ModalController;
+import fi.jyu.mit.fxgui.ModalControllerInterface;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
+import javafx.stage.Stage;
+import liiga.Pelaaja;
+
+
+/**
+ * @author Valtteri Peltoniemi & Konsta K‰ht‰v‰
+ * @version 8.3.2019
+ *
+ */
+public class PelaajanMuokkausGUIController implements ModalControllerInterface<Pelaaja>, Initializable {
+
+    
+    @FXML private ScrollPane panelPelaaja;
+    @FXML private TextField editNimi;
+    @FXML private TextField editJoukkue;
+    
+    @Override
+    public void initialize(URL arg0, ResourceBundle arg1) {
+        alusta();
+        
+    }
+
+
+    
+    
+    @FXML private void handleTallenna() {
+        
+        
+        if ( pelaajaKohdalla != null && pelaajaKohdalla.getnimi().trim().equals("") ) {
+            Dialogs.showMessageDialog("Nimi ei voi olla tyhj‰!");
+            return;
+        }
+        ModalController.closeStage(editNimi); 
+    }
+    
+    
+    @FXML private void handlePeruuta() {
+        pelaajaKohdalla = null;
+        ModalController.closeStage(editNimi);
+    }
+    
+ //===========================================================================================   
+    
+    private Pelaaja pelaajaKohdalla;
+    private TextField edits[];  
+    
+    /**
+     * tyhjent‰‰ tekstikent‰t
+     */
+    public void tyhjenna() {
+        for (TextField edit : edits)
+            edit.setText("");
+    }
+    
+
+    
+    /**
+     * @param pelaaja n‰ytett‰v‰ pelaaja
+     */
+    public void naytaPelaaja(Pelaaja pelaaja) {
+        if ( pelaaja == null) return;
+        
+        TextField[] edit = new TextField[] {editNimi, editJoukkue};
+        naytaPelaaja(edit, pelaaja);
+
+    } 
+    
+    /**
+     * N‰ytt‰‰ v‰liaikaisesti valitun pelaajan tiedot  tekstikentt‰‰n.
+     * @param edit teksfield taulukko
+     * @param pelaaja pelaaja
+     */
+    public static void naytaPelaaja(TextField[] edit, Pelaaja pelaaja) {
+        if ( pelaaja == null) return;
+        edit[0].setText(pelaaja.getnimi());
+        //edit[1].setText(pelaaja.getJoukkue());
+
+    } 
+  
+    
+    /**
+     * @param modalityStage mille ollaan modaalisia, null = sovellukselle 
+     * @param oletus mit‰ dataa n‰ytet‰‰n oletuksena
+     * @return null jos painetaan cancel
+     */
+    public static Pelaaja kysyPelaaja(Stage modalityStage, Pelaaja oletus) {
+        return ModalController.showModal(
+                PelaajanMuokkausGUIController.class.getResource("PelaajanMuokkausGUIView.fxml"),"Liiga", modalityStage,oletus,null);
+        
+    }
+
+    /**
+     * tekee tarvittavat alustukset
+     */
+    protected void alusta() {
+        edits = new TextField[]{editNimi, editJoukkue};
+        int i = 0;
+        for (TextField edit : edits) {
+            final int k = ++i;
+            edit.setOnKeyReleased( e -> kasitteleMuutosPelaajaan(k, (TextField)(e.getSource())));
+        }
+    
+    }
+
+
+    private void kasitteleMuutosPelaajaan(int k, TextField edit) {
+        if(pelaajaKohdalla == null) return;
+        String s = edit.getText();
+        String virhe = null;
+        switch (k) {
+            case 1 : virhe = pelaajaKohdalla.setNimi(s); break;
+            //case 2 : virhe = pelaajaKohdalla.setJoukkue(s); break;
+            default:
+        }
+        if(virhe == null) {
+            Dialogs.setToolTipText(edit, "");
+            edit.getStyleClass().removeAll("virhe");
+            //Dialogs.showMessageDialog("ei onnistu");
+        } else {
+            Dialogs.setToolTipText(edit, virhe);
+            edit.getStyleClass().add("virhe");
+            Dialogs.showMessageDialog("ei onnistu ei");
+        }
+        
+    }
+
+
+
+
+    @Override
+    public Pelaaja getResult() {
+        return pelaajaKohdalla;
+    }
+
+    /*
+     * mit‰ tehd‰‰n kun dialogi on n‰ytetty
+     */
+    @Override
+    public void handleShown() {
+        editNimi.requestFocus();
+        
+    }
+
+
+    @Override
+    public void setDefault(Pelaaja oletus) {
+        pelaajaKohdalla = oletus;
+        naytaPelaaja(edits, pelaajaKohdalla);
+        
+    }
+
+
+
+}
